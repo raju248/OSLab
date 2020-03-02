@@ -5,20 +5,16 @@ struct process
 {
     int id ;
     int cpuTime ;
-    int arrivalTime;
-    int waitTime =0;
-    int serviceTime=0;
+    int arrivalTime ;
+    int waitTime;
+    int serviceTime;
     int turnAroundTime;
     int completeTime=0;
     int remainTime;
-    int priority;
 };
 
 bool comp(process a, process b)
 {
-    if( a.arrivalTime == b.arrivalTime)
-        return a.priority < b.priority;
-
     return a.arrivalTime < b.arrivalTime;
 }
 
@@ -27,32 +23,25 @@ bool compID(process a, process b)
     return a.id < b.id;
 }
 
-
-
 int main()
 {
     //freopen("input.txt", "r", stdin);
     //freopen("output.txt", "w", stdout);
-
-    int n, q;
-
+    int n;
+    int total_time = 0;
     int totalWaitTime = 0;
     int totalTurnAroundTime = 0;
-    int total_time = 0;
 
     cout << "Enter the number of process : ";
     cin >> n;
 
     vector<process> v (n);
-    vector<process> temp;
-
-    int x;
 
     cout << "Enter the CPU times :\n";
 
     for(int i=0;i<n;i++)
     {
-        cin >> v[i].cpuTime ;
+        cin >>  v[i].cpuTime;
         v[i].id = i+1;
         v[i].remainTime = v[i].cpuTime;
     }
@@ -64,25 +53,17 @@ int main()
         cin >> v[i].arrivalTime;
     }
 
-    cout << "Enter Priority :\n";
-
-    for(int i=0;i<n;i++)
-    {
-        cin >> v[i].priority;
-    }
-
     sort(v.begin(),v.end(),comp);
 
-    int current_process = 0;
     int processCount = 0;
+    int current_process = 0;
 
     cout << "0";
-
     while(true)
     {
         processCount++;
 
-        if(current_process ==0)
+        if(current_process==0)
             v[current_process].waitTime = 0;
         else
            totalWaitTime += v[current_process].waitTime = total_time - v[current_process].arrivalTime;
@@ -95,21 +76,19 @@ int main()
 
         totalTurnAroundTime += v[current_process].turnAroundTime = v[current_process].waitTime + v[current_process].cpuTime;
 
-        int nextProcessPriority = 99;
+        int nextJobCpuTime = 9999;
 
-        //select the next process with highest priority
-        for(int i=0;i<n;i++)
+        for(int i =0;i<n;i++)
         {
-            if(v[i].arrivalTime <= total_time && v[i].priority < nextProcessPriority && v[i].remainTime!=0)
+            if(v[i].arrivalTime<=total_time && v[i].cpuTime<nextJobCpuTime && v[i].remainTime!=0)
             {
-                nextProcessPriority = v[i].priority;
+                nextJobCpuTime = v[i].cpuTime;
                 current_process = i;
             }
         }
 
         if(processCount==n)
             break;
-
     }
 
     cout << endl;
@@ -123,8 +102,10 @@ int main()
         cout << "Process " << it->id << ":  waiting time : " << it->waitTime << " turn around time : " << (it->cpuTime + it->waitTime)  << endl;
     }
 
-    cout << "Average Waiting Time : " << totalWaitTime/(1.0*n) << endl;
-    cout << "Average Turnaround Time : " << totalTurnAroundTime/(1.0*n) << endl;
+    cout << endl;
+
+    cout << "Average waiting time : " << totalWaitTime/(n*1.0) << endl;
+    cout << "Average turn around time : " << totalTurnAroundTime/(n*1.0) <<endl;
 
     return 0;
 }
